@@ -7,14 +7,6 @@
        mc:Ignorable="d"
         Title="GraphingWindow" Height="300" Width="600" WindowState="Maximized">
     
-<Window.Resources>
-        <DataTemplate DataType="{x:Type local:SyntaxNode}">
-            <Border BorderBrush="Black" BorderThickness="1" Padding="0" CornerRadius="5">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Label}"/>
-                    </StackPanel>
-                </Border>
-        </DataTemplate>
-    </Window.Resources>
+<Image Name="graphImage"></Image>
 
 </Window>

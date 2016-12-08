@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Shields.GraphViz.Components;
 using Shields.GraphViz.Models;
@@ -29,7 +30,7 @@ namespace TinyParser
 
         private string GetGraphvizBinaryPath()
         {
-            string cmd = "doddt";
+            string cmd = "dot";
             Process proc = new Process();
             proc.StartInfo.FileName = "where.exe";
             proc.StartInfo.Arguments = cmd;
@@ -59,8 +60,10 @@ namespace TinyParser
             _graph = Graph.Undirected.Add(AttributeStatement.Graph.Set("splines", "true"));
             
             DrawNode(node);
-            IRenderer renderer = new Renderer(GetGraphvizBinaryPath()); 
-            using (Stream file = File.Create("graph.png")) //todo : remove hardcoded output path
+            IRenderer renderer = new Renderer(GetGraphvizBinaryPath());
+            string fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".png";
+
+            using (Stream file = File.Create(fileName)) 
             {
                 await renderer.RunAsync(
                     _graph, file,
@@ -68,6 +71,8 @@ namespace TinyParser
                     RendererFormats.Png,
                     CancellationToken.None);
             }
+            graphImage.Source = new BitmapImage(new Uri(fileName));
+
         }
 
         private void DrawNode(SyntaxNode node)
