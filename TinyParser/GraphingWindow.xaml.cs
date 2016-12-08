@@ -54,25 +54,35 @@ namespace TinyParser
         
         public async void Draw(SyntaxNode node)
         {
-            idsDict.Clear();
-            nodeIndex = 0;
-         
-            _graph = Graph.Undirected.Add(AttributeStatement.Graph.Set("splines", "true"));
-            
-            DrawNode(node);
-            IRenderer renderer = new Renderer(GetGraphvizBinaryPath());
-            string fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".png";
-
-            using (Stream file = File.Create(fileName)) 
+            try
             {
-                await renderer.RunAsync(
-                    _graph, file,
-                    RendererLayouts.Dot,
-                    RendererFormats.Png,
-                    CancellationToken.None);
-            }
-            graphImage.Source = new BitmapImage(new Uri(fileName));
+                idsDict.Clear();
+                nodeIndex = 0;
 
+                _graph = Graph.Undirected.Add(AttributeStatement.Graph.Set("splines", "true"));
+
+                DrawNode(node);
+                IRenderer renderer = new Renderer(GetGraphvizBinaryPath());
+                string fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".png";
+
+                using (Stream file = File.Create(fileName))
+                {
+                    await renderer.RunAsync(
+                        _graph, file,
+                        RendererLayouts.Dot,
+                        RendererFormats.Png,
+                        CancellationToken.None);
+                }
+                graphImage.Source = new BitmapImage(new Uri(fileName));
+
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                this.Close();
+                ;
+            }
+            
         }
 
         private void DrawNode(SyntaxNode node)
