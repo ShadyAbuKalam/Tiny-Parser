@@ -118,7 +118,7 @@ namespace TinyParser
         {
             var id = new NodeId(_nodeIndex.ToString());
             _idsDict.Add(node, id);
-            var n = NodeStatement.For(id.Id).Set("label", node.Label+" "+_nodeIndex);
+            var n = NodeStatement.For(id.Id).Set("label", node.Label);
             if (node.Shape == NodeShape.Square)
                 n =n.Set("shape", "box");
             if(node.ChildNodes.TrueForAll(child => child.Sibling==null)) // If the children has no siblings, make the output edges drawn in order
