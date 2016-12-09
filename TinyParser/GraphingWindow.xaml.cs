@@ -67,7 +67,7 @@ namespace TinyParser
 
                 DrawNode(node);
                 IRenderer renderer = new Renderer(GetGraphvizBinaryPath());
-                string fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".png";
+                var fileName = Path.GetTempPath() + Guid.NewGuid() + ".png";
                 Stream file = File.Create(fileName);
 
                 do
