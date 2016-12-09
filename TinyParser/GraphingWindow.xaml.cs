@@ -99,12 +99,16 @@ namespace TinyParser
 
                 _graph = _graph.Add(EdgeStatement.For(idsDict[node], idsDict[childNode]));
             }
+            //Set all children on same level
+            if (node.ChildNodes.Count > 2)
+                _graph = _graph.Add(new SameRankStatement(node.ChildNodes.ConvertAll(snode => idsDict[snode])));
+
             if (node.Sibling != null)
             {
                 DrawNode(node.Sibling);
                 
                 _graph = _graph.Add(EdgeStatement.For(idsDict[node], idsDict[node.Sibling]).Set("headport","w").Set("tailport","e"));
-                _graph = _graph.Add(new SameRankStatement(idsDict[node],idsDict[node.Sibling]));
+                _graph = _graph.Add(new SameRankStatement(new List<NodeId>() { idsDict[node], idsDict[node.Sibling] }));
 
             }
         }
@@ -127,21 +131,26 @@ namespace TinyParser
 
      class SameRankStatement : Statement
     {
-        public NodeId A { get;  }
-        public NodeId B { get; }
+        public List<NodeId> NodeList { get;  }
 
-        public SameRankStatement(NodeId a, NodeId b) : base(ImmutableDictionary<Id, Id>.Empty)
+        public SameRankStatement(List<NodeId > nodeList) : base(ImmutableDictionary<Id, Id>.Empty)
         {
-            A = a;
-            B = b;
+            if(nodeList.Count <2 )
+                throw  new InvalidOperationException("There must be two nodes at least");
+            NodeList = nodeList;
+            
+            
         }
 
         public override void WriteTo(StreamWriter writer, GraphKinds graphKind)
         {
             writer.Write("{rank=same; ");
-            A.WriteTo(writer);
-            writer.Write(" "); //Spaces between the nodes is important
-            B.WriteTo(writer);
+            foreach (var nodeId in NodeList)
+            {
+                nodeId.WriteTo(writer);
+                writer.Write(" "); //Spaces between the nodes is important
+            }
+       
 
             writer.Write(";}");
         }
