@@ -47,22 +47,30 @@ namespace TinyParser
             {
                 return null;
             }
-            var node = Statement();
-            var tmp = node;
-            while (_currentToken != null && _currentToken.Type == TokenType.SEMI)
+            try
             {
-                try
+                var node = Statement();
+                var tmp = node;
+                while (_currentToken != null && _currentToken.Type == TokenType.SEMI)
                 {
-                    Match(TokenType.SEMI);
-                    tmp.Sibling = Statement();
-                    tmp = tmp.Sibling;
+                    try
+                    {
+                        Match(TokenType.SEMI);
+                        tmp.Sibling = Statement();
+                        tmp = tmp.Sibling;
+                    }
+                    catch (Exception e)
+                    {
+                        Error("Something Went Wrong: " + e);
+                    }
                 }
-                catch (Exception e)
-                {
-                    Error("Something Went Wrong: " + e);
-                }
+                return node;
             }
-            return node;
+            catch (ArgumentException)
+            {
+                Error("Wrong Grammar");
+            }
+            return null;
         }
 
         private SyntaxNode Statement()
@@ -90,7 +98,7 @@ namespace TinyParser
                     node = assign_stmt();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentException();
             }
             return node;
         }
