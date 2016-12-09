@@ -93,6 +93,7 @@ namespace TinyParser
         {
             var NodeStatement = CreateNode(node);
             _graph = _graph.Add(NodeStatement);
+
             foreach (var childNode in node.ChildNodes)
             {
                 DrawNode(childNode);
@@ -106,22 +107,26 @@ namespace TinyParser
             if (node.Sibling != null)
             {
                 DrawNode(node.Sibling);
-                
-                _graph = _graph.Add(EdgeStatement.For(idsDict[node], idsDict[node.Sibling]).Set("headport","w").Set("tailport","e"));
+
+                _graph = _graph.Add(EdgeStatement.For(idsDict[node], idsDict[node.Sibling]).Set("headport", "w").Set("tailport", "e"));
                 _graph = _graph.Add(new SameRankStatement(new List<NodeId>() { idsDict[node], idsDict[node.Sibling] }));
 
             }
+  
+      
+
         }
-        
+
         private NodeStatement CreateNode(SyntaxNode node)
         {
             var id = new NodeId(nodeIndex.ToString());
             idsDict.Add(node, id);
-            NodeStatement n;
+            NodeStatement n = NodeStatement.For(id.Id).Set("label", node.Label+" "+nodeIndex.ToString());
             if (node.Shape == NodeShape.Square)
-                n = NodeStatement.For(id.Id).Set("label", node.Label).Set("shape", "box");
-            else
-                n = NodeStatement.For(id.Id).Set("label", node.Label);
+                n =n.Set("shape", "box");
+            if(node.ChildNodes.TrueForAll(child => child.Sibling==null)) // If the children has no siblings, make the output edges drawn in order
+                n = n.Set("ordering", "out");
+
 
             nodeIndex++;
             return n;
