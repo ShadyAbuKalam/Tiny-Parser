@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Shields.GraphViz.Components;
@@ -66,17 +67,21 @@ namespace TinyParser
 
                 DrawNode(node);
                 IRenderer renderer = new Renderer(GetGraphvizBinaryPath());
-                var fileName = Path.GetTempPath() + Guid.NewGuid() + ".png";
+                string fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".png";
+                Stream file = File.Create(fileName);
 
-                using (Stream file = File.Create(fileName))
+                do
                 {
-                    await renderer.RunAsync(
+                    await Task.WhenAll(renderer.RunAsync(
                         _graph, file,
                         RendererLayouts.Dot,
                         RendererFormats.Png,
-                        CancellationToken.None);
-                }
-                GraphImage.Source = new BitmapImage(new Uri(fileName));
+                        CancellationToken.None));
+                } while (file.Length == 0);
+                file.Close();                
+                var image  = new BitmapImage(new Uri(fileName));
+                
+                GraphImage.Source = image;
 
             }
             catch (Exception e)
