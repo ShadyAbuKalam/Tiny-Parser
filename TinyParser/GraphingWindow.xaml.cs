@@ -37,15 +37,19 @@ namespace TinyParser
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.RedirectStandardOutput = true;
             proc.Start();
+            proc.WaitForExit();
+
             if (proc.ExitCode == 0)
             {
                 string output = proc.StandardOutput.ReadToEnd();
                 output = Path.GetDirectoryName(output.Substring(0, output.Length - 2));
+                proc.Close();
                 return output;
 
             }
             else
             {
+                proc.Close();
                 throw new Exception("Graphviz is not installed on your system or Its bin folder is  not registered in PATH");
             }
 
